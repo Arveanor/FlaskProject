@@ -16,3 +16,4 @@ class Config(object):
 	ADMINS = ['keysertheloner@gmail.com']
 	POSTS_PER_PAGE = 3
 	LANGUAGES = ['en', 'es']
+	LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')

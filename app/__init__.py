@@ -16,7 +16,7 @@ moment = Moment()
 login = LoginManager()
 mail = Mail()
 bootstrap = Bootstrap()
-login.login_view = 'login'
+login.login_view = 'auth.login'
 
 def create_app(config_class=Config):
 	app = Flask(__name__)
@@ -54,22 +54,23 @@ def create_app(config_class=Config):
 			mail_handler.setLevel(logging.ERROR)
 			app.logger.addHandler(mail_handler)
 
-	if not os.path.exists('logs'):
-		os.mkdir('logs')
-	file_handler = RotatingFileHandler('logs/helloflask.log', maxBytes=10240, backupCount=10)
-	file_handler.setFormatter(logging.Formatter(
-		'%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-	file_handler.setLevel(logging.INFO)
-	app.logger.addHandler(file_handler)
 
-	app.logger.setLevel(logging.INFO)
-	app.logger.info('Helloflask startup')
+	if app.config['LOG_TO_STDOUT']:
+		stream_handler = logging.StreamHandler()
+		stream_handler.setLevel(logging.INFO)
+		app.logger.addHandler(stream_handler)
+	else:
+		if not os.path.exists('logs'):
+			os.mkdir('logs')
+		file_handler = RotatingFileHandler('logs/helloflask.log', maxBytes=10240, backupCount=10)
+		file_handler.setFormatter(logging.Formatter(
+			'%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+		file_handler.setLevel(logging.INFO)
+		app.logger.addHandler(file_handler)
+
+		app.logger.setLevel(logging.INFO)
+		app.logger.info('Helloflask startup')
 
 	return app
-
-@babel.localeselector
-def get_locale():
-	return request.accept_languages.best_match(app.config['LANGUAGES'])
-
 
 from app import models
